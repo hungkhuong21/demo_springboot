@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách sản phẩm đa ngôn ngữ</title>
+</head>
+<body>
+<h2>Chọn ngôn ngữ:</h2>
+
+<form action="/" method="get">
+    <select name="lang">
+        <option th:each="l : ${languages}"
+                th:value="${l.languageId}"
+                th:text="${l.languageName}"
+                th:selected="${l.languageId == selectedLang}">
+        </option>
+    </select>
+    <button type="submit">Xem</button>
+</form>
+
+<hr/>
+
+<h2>Danh sách sản phẩm:</h2>
+
+<div th:if="${#lists.isEmpty(products)}">
+    <p>Không có sản phẩm trong ngôn ngữ này.</p>
+</div>
+
+<div th:each="p : ${products}">
+    <h3 th:text="${p.productName}"></h3>
+    <p th:text="${p.description}"></p>
+    <p>💰 Giá: <span th:text="${p.product.price}"></span> VNĐ</p>
+    <hr/>
+</div>
+
+</body>
+</html>
