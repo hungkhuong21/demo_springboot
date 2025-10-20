@@ -18,7 +18,8 @@ public class ProductTranslationId implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ProductTranslationId that)) return false;
+        if (!(o instanceof ProductTranslationId)) return false;
+        ProductTranslationId that = (ProductTranslationId) o;
         return productId == that.productId && Objects.equals(languageId, that.languageId);
     }
 

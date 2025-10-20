@@ -17,7 +17,6 @@ public class ProductTranslation {
     @Column(name = "ProductName")
     private String productName;
 
-    // ⚠️ Sửa lại tên cột cho đúng trong DB
     @Column(name = "ProductDescription")
     private String description;
 
