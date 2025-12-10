@@ -1,26 +1,21 @@
 package com.example.demo.controller;
 
-import com.example.demo.entity.*;
-import com.example.demo.repository.*;
+import com.example.demo.service.StoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.*;
-
 @Controller
 public class StoreController {
 
-    @Autowired
-    private LanguageRepository languageRepository;
+    private final StoreService storeService;
 
     @Autowired
-    private ProductTranslationRepository productTranslationRepository;
-
-    @Autowired
-    private ProductCategoryTranslationRepository productCategoryTranslationRepository;
+    public StoreController(StoreService storeService) {
+        this.storeService = storeService;
+    }
 
     @GetMapping("/")
     public String index(
@@ -28,30 +23,15 @@ public class StoreController {
             @RequestParam(name = "categoryId", required = false) Long categoryId,
             Model model) {
 
-        List<Language> languages = languageRepository.findAll();
-        List<ProductTranslation> products = productTranslationRepository.findByLanguageId(lang);
-        List<ProductCategoryTranslation> categories = productCategoryTranslationRepository.findById_LanguageID(lang);
+        // Lấy dữ liệu từ Service layer (business logic đã được xử lý trong Service)
+        StoreService.StoreData storeData = storeService.getStoreData(lang, categoryId);
 
-        // Tạo map nhóm sản phẩm theo danh mục
-        Map<Long, List<ProductTranslation>> productsByCategory = new HashMap<>();
-        for (ProductTranslation product : products) {
-            Long catId = (long) product.getProduct().getProductCategoryID();
-            productsByCategory.computeIfAbsent(catId, k -> new ArrayList<>()).add(product);
-        }
-
-        // Nếu chọn category → chỉ lấy sản phẩm thuộc category đó
-        List<ProductTranslation> filteredProducts;
-        if (categoryId != null) {
-            filteredProducts = productsByCategory.getOrDefault(categoryId, new ArrayList<>());
-        } else {
-            filteredProducts = products; // mặc định: hiển thị tất cả
-        }
-
-        model.addAttribute("languages", languages);
-        model.addAttribute("categories", categories);
-        model.addAttribute("products", filteredProducts);
-        model.addAttribute("selectedLang", lang);
-        model.addAttribute("selectedCategoryId", categoryId);
+        // Thêm dữ liệu vào Model để truyền sang View
+        model.addAttribute("languages", storeData.getLanguages());
+        model.addAttribute("categories", storeData.getCategories());
+        model.addAttribute("products", storeData.getProducts());
+        model.addAttribute("selectedLang", storeData.getSelectedLang());
+        model.addAttribute("selectedCategoryId", storeData.getSelectedCategoryId());
 
         return "index";
     }
